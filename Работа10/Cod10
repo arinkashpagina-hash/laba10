@@ -1,0 +1,150 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <math.h>
+#include <locale.h>
+
+double fa(double x);
+double fb(double x);
+double my_sin_n(double x, int N);
+double my_sin_eps(double x, double eps);
+float area(float a, float b, float c);
+void draw(int h);
+void info();
+
+int main() {
+    setlocale(LC_ALL, "Russian");
+    double x, res1, res2;
+    int menu;
+
+    printf("Задание 1\n");
+    printf("x = ");
+    scanf("%lf", &x);
+
+    res1 = fa(x);
+    res2 = fb(x);
+
+    printf("fa = %.4f\n", res1);
+    printf("fb = %.4f\n", res2);
+    printf("Произведение: %.4f\n", res1 * res2);
+    printf("Разность квадратов: %.4f\n", res1 * res1 - res2 * res2);
+    printf("Удвоенная сумма: %.4f\n", 2.0 * (res1 + res2));
+
+    printf("\nНажми Enter...\n");
+    getchar(); getchar();
+
+    printf("\nЗадание 2\n");
+    double xs, eps, st, se;
+    int i;
+
+    printf("Введите x (в радианах): ");
+    scanf("%lf", &xs);
+    printf("Введите точность eps: ");
+    scanf("%lf", &eps);
+
+    st = sin(xs);
+
+    printf("\n N |   sin_N   | отклонение\n");
+    printf("_______________________________________________\n");
+
+    for (i = 1; i <= 19; i += 2) {
+        double sn = my_sin_n(xs, i);
+        double diff = fabs(st - sn);
+        printf("%2d | %9.6f | %9.6e\n", i, sn, diff);
+    }
+
+    se = my_sin_eps(xs, eps);
+    printf("\nС точностью eps = %.1e: %.6f\n", eps, se);
+    printf("Отклонение: %.6e\n", fabs(st - se));
+
+    printf("\nНажми Enter...\n");
+    getchar(); getchar();
+
+    printf("\nЗадание 3\n");
+    do {
+        printf("\n1-Площадь\n2-Определение\n3-Нарисовать\n0-Выход\nВыбор: ");
+        scanf("%d", &menu);
+
+        if (menu == 1) {
+            float a, b, c;
+            printf("Стороны a b c: ");
+            scanf("%f %f %f", &a, &b, &c);
+            if (a + b > c && a + c > b && b + c > a) {
+                printf("S = %.2f\n", area(a, b, c));
+            }
+            else {
+                printf("Нет такого треугольника\n");
+            }
+        }
+        else if (menu == 2) {
+            info();
+        }
+        else if (menu == 3) {
+            int h;
+            printf("Высота: ");
+            scanf("%d", &h);
+            draw(h);
+        }
+    } while (menu != 0);
+
+    return 0;
+}
+
+double fa(double x) {
+    if (x <= 3.0) {
+        return (x * x - 3.0 * x + 9.0) / (x * x * x + 3.0);
+    }
+    else {
+        return 1.0 / (x * x * x + 3.0);
+    }
+}
+
+double fb(double x) {
+    return x * exp(sin(x * x));
+}
+
+double my_sin_n(double x, int N) {
+    double sum = x;
+    double term = x;
+    int k;
+    for (k = 1; k < N; k++) {
+        term = -term * x * x / ((2.0 * k) * (2.0 * k + 1.0));
+        sum = sum + term;
+    }
+    return sum;
+}
+
+double my_sin_eps(double x, double eps) {
+    double sum = x;
+    double term = x;
+    int k = 1;
+    while (fabs(term) > eps) {
+        term = -term * x * x / ((2.0 * k) * (2.0 * k + 1.0));
+        sum = sum + term;
+        k++;
+    }
+    return sum;
+}
+
+float area(float a, float b, float c) {
+    float p = (a + b + c) / 2.0;
+    return sqrt(p * (p - a) * (p - b) * (p - c));
+}
+
+void draw(int h) {
+    int i, j;
+    for (i = 1; i <= h; i++) {
+        for (j = 1; j <= i; j++) {
+            if (j == 1 || j == i || i == h) {
+                printf("*");
+            }
+            else {
+                printf(" ");
+            }
+        }
+        printf("\n");
+    }
+}
+
+void info() {
+    printf("Прямоугольный треугольник - треугольник с углом 90 градусов.\n");
+}
